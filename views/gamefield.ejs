@@ -6,6 +6,7 @@
     <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="/javascripts/canvasHandler.js"></script>
 </head>
 <body>
 <div class="row">
@@ -41,7 +42,9 @@
     <div class="panel panel-info col-lg-8 col-mg-8 col-sm-10">
         <div class="panel-heading">Время партии: 0:0</div>
         <div class="panel-body">
-            lalal
+            <canvas id='field' width="900" height="900">
+                <!-- Здесь отрисуем игровое поле -->
+            </canvas>
         </div>
     </div>
     <div class="col-lg-2 col-mg-2 col-sm-1" style="border: 1px solid red">
