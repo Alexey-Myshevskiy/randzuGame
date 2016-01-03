@@ -23,6 +23,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 app.post('/new_player',function(req,res){
+  var socket = require('socket.io')();
+  socket.on('connection', function(socket){});
+  socket.listen(3001);
   res.render('gamefield.ejs');
 });
 

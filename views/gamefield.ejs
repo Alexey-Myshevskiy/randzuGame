@@ -8,13 +8,9 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="/javascripts/canvasHandler.js"></script>
     <script src="/javascripts/howler.min.js"></script>
+    <script src="/javascripts/soundMixer.js"></script>
     <script language="JavaScript1.5">
-          var sound = new Howl({
-          urls: ['/sounds/track_1.mp3', '/sounds/track_2.mp3', '/sounds/track_3.mp3'],
-          autoplay: false,//true
-          loop: true,
-          buffer: true,
-          volume: 0.8,});
+    player.startPlay();
           //----------- control buttons handlers -----------------//
           function stopPlayBtn(element){
             var Element = element;
@@ -25,13 +21,15 @@
                 Element.replaceWith(
                 "<button id='playStop' type='button' class='btn btn-default' onclick='stopPlayBtn($(this))'>"+
                 "<span class='glyphicon glyphicon-volume-up' aria-hidden='true'></span>\t"+variants[1]+"</button>");
-                sound.pause();
+               // playlist().getCurrentTrack().pause();
+               player.stopPlay();
             }
             else{
                  Element.replaceWith(
                 "<button id='playStop' type='button' class='btn btn-default' onclick='stopPlayBtn($(this))'>"+
                 "<span class='glyphicon glyphicon-volume-off' aria-hidden='true'></span>\t"+variants[0]+"</button>");
-                sound.play();
+                //sound.play();
+                player.continuePlay();
             }
           }
     </script>
