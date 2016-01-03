@@ -7,32 +7,57 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="/javascripts/canvasHandler.js"></script>
+    <script src="/javascripts/howler.min.js"></script>
+    <script language="JavaScript1.5">
+          var sound = new Howl({
+          urls: ['/sounds/track_1.mp3', '/sounds/track_2.mp3', '/sounds/track_3.mp3'],
+          autoplay: false,//true
+          loop: true,
+          buffer: true,
+          volume: 0.8,});
+          //----------- control buttons handlers -----------------//
+          function stopPlayBtn(element){
+            var Element = element;
+            var textElement = Element.text();
+            var variants = ['Выключить звук','Включить звук'];
+            if(textElement.trim()==variants[0])
+            {
+                Element.replaceWith(
+                "<button id='playStop' type='button' class='btn btn-default' onclick='stopPlayBtn($(this))'>"+
+                "<span class='glyphicon glyphicon-volume-up' aria-hidden='true'></span>\t"+variants[1]+"</button>");
+                sound.pause();
+            }
+            else{
+                 Element.replaceWith(
+                "<button id='playStop' type='button' class='btn btn-default' onclick='stopPlayBtn($(this))'>"+
+                "<span class='glyphicon glyphicon-volume-off' aria-hidden='true'></span>\t"+variants[0]+"</button>");
+                sound.play();
+            }
+          }
+    </script>
 </head>
 <body>
+
 <div class="row">
     <div class="col-md-offset-2 col-lg-offset-2 col-sm-offset-1">
-    <div class="btn-toolbar col-lg-8 col-mg-8 col-sm-10" role="toolbar" aria-label="...">
-<!--        <button type="button" class="btn btn-default">
-            <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
-            Начать заново
-        </button>-->
-        <button type="button" class="btn btn-default">
-            <span class="glyphicon glyphicon-pause" aria-hidden="true"></span>
-            Пауза
-        </button>
-        <button type="button" class="btn btn-default">
-            <span class="glyphicon glyphicon-volume-off" aria-hidden="true"></span>
-            Выключить звук
-        </button>
-        <button type="button" class="btn btn-default">
-            <span class="glyphicon glyphicon-flag" aria-hidden="true"></span>
-            Сдаться
-        </button>
-        <button type="button" class="btn btn-default">
-            <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
-            Правила
-        </button>
-    </div>
+        <div class="btn-toolbar col-lg-8 col-mg-8 col-sm-10" role="toolbar" aria-label="...">
+            <button type="button" class="btn btn-default">
+                <span class="glyphicon glyphicon-pause" aria-hidden="true"></span>
+                Пауза
+            </button>
+            <button id="playStop" type="button" class="btn btn-default" onclick="stopPlayBtn($(this))">
+                <span class="glyphicon glyphicon-volume-off" aria-hidden="true"></span>
+                Выключить звук
+            </button>
+            <button type="button" class="btn btn-default">
+                <span class="glyphicon glyphicon-flag" aria-hidden="true"></span>
+                Сдаться
+            </button>
+            <button type="button" class="btn btn-default">
+                <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+                Правила
+            </button>
+        </div>
     </div>
 </div>
 <div class="row">
