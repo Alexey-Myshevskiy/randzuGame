@@ -4,8 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
-var routes = require('./routes/index');
+var mymodule = require('./bin/processesObserver');
 
 var app = express();
 
@@ -21,12 +20,14 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', routes);
-app.post('/new_player',function(req,res){
+app.get('/', function(req, res, next) {
+  res.render('index');
+});
+app.post('/players-room',mymodule,function(req,res){
   var socket = require('socket.io')();
   socket.on('connection', function(socket){});
   socket.listen(3001);
-  res.render('gamefield.ejs');
+  res.render('playersRoom',{playerName:req.body.playerName});
 });
 
 // catch 404 and forward to error handler

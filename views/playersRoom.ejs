@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Новый игрок</title>
+    <link rel='stylesheet' href='/stylesheets/style.css'/>
+    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="jumbotron">
+    <h1 class="text-center">Добро пожаловать <%= playerName %></h1>
+    <div class="instruction">
+    <h2 class="instruction">Правила игры RandZU</h2>
+    <h3 class="instruction">Основные правила</h3>
+    <h4 class="instruction">
+        <p class="lead">
+            Играют два соперника: один чёрными фишками (камнями), другой — белыми.
+            Игра проходит на расчерченной в клетку доске размером 15 на 15 линий.
+        </p>
+        <p class="lead">
+            Игроки делают ходы по очереди. Первыми ходят чёрные.
+            Каждым ходом игрок выставляет на доску в любое свободное пересечение линий доски один камень своего цвета.
+        </p>
+        <p class="lead">
+            Побеждает тот, кто сможет первым построить непрерывный ряд из пяти камней своего цвета — по горизонтали,
+            по вертикали или в диагональном направлении.
+        </p>
+    </h4>
+    </div>
+    <div class="text-center">
+        <button type="button" class="btn btn-success btn-lg">Играть с компъютером</button>
+        <button type="button" class="btn btn-success btn-lg">Играть с другими игроками</button>
+    </div>
+</div>
+</body>
+</html>
