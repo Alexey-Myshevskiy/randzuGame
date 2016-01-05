@@ -41,26 +41,50 @@
     </div>
 </div>
 <script>
-    $("#submit").click(function () {
-        var workDiv = $("#progress");
-        workDiv.css("visibility", "visible");
-        var value = $("#pName").val();
-        $.ajax({
-            url: "http://localhost:3000/checkName?name=" + value,
-            success: function (result) {
-                if (!result.isExist) {
-                    $("form").submit();
-                }
-                else {
-                    workDiv.html("<div class='alert alert-warning' role='alert'>" +
-                            "<strong>Это имя уже занято, выберете другое</strong></div>");
-                    $("input").val('').focus();
-                }
-            },
-            error: function (err) {
-                console.log(err);
+    function changeContent(content) {
+        $("#progress").html(content).css("visibility", "visible");
+    }
+    function resetToDefaultContent() {
+        $("#progress").css("visibility", "hidden").html("<strong>Проверка имени...</strong>" +
+                "<div class='progress progress-striped active nameIndicator'>" +
+                "<div class='progress-bar' role='progressbar' aria-valuenow='100' aria-valuemin='0'" +
+                "aria-valuemax='100' style='width: 100%'></div> </div>");
+    }
+    $("#submit").click(function (event) {
+        if ($("input").val() == '') {
+            changeContent("<div class='alert alert-warning' role='alert'>" +
+                    "<strong>Имя не может быть пустым</strong></div>");
+        }
+        else {
+            if ($("#progress").css('visibility') == 'visible') {
+                resetToDefaultContent();
+                $("#progress").css("visibility", "visible");
             }
-        });
+            else {
+                $("#progress").css("visibility", "visible");
+            }
+            var value = $("#pName").val();
+            $.ajax({
+                url: "http://localhost:3000/checkName?name=" + value,
+                success: function (result) {
+                    if (!result.isExist) {
+                        $("form").submit();
+                    }
+                    else {
+                        changeContent("<div class='alert alert-warning' role='alert'>" +
+                                "<strong>Это имя уже занято, выберете другое</strong></div>");
+                        $("input").val('').focus(function () {
+                            if ($("#progress").css('visibility') == 'visible') {
+                                resetToDefaultContent();
+                            }
+                        });
+                    }
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            });
+        }
     });
 </script>
 </body>
