@@ -18,3 +18,7 @@ h3.instruction {
 h4.instruction {
   margin-left: 45px;
 }
+div.nameIndicator{
+  width: 65%;
+  display: inline-flex;
+}

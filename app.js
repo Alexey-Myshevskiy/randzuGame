@@ -4,7 +4,6 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var mymodule = require('./bin/processesObserver');
 
 var app = express();
 
@@ -20,14 +19,37 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', function(req, res, next) {
-  res.render('index');
+app.get('/', function(req, res) {
+  res.render('index',{pCount:app.observer.countOfPlayers()});
 });
-app.post('/players-room',mymodule,function(req,res){
-  var socket = require('socket.io')();
-  socket.on('connection', function(socket){});
-  socket.listen(3001);
-  res.render('playersRoom',{playerName:req.body.playerName});
+app.get('/checkName',function(req,res){
+  setTimeout(function() {
+    var is = app.observer.isExistPlayer(req.query.name);
+    res.status(200).jsonp({isExist:is})
+  }, 3*1000);
+});
+app.post('/players-room',function(req,res){
+/*  app.io.on('connection', function(socket){
+    console.log(socket.rooms.length);
+    socket.on("let's play", function (data) {
+      console.log(data);
+    });
+    socket.on('disconnect', function() {
+      console.log('Got disconnect!');
+      console.log(socket.rooms.length);
+    });
+  });*/
+  var newPlayerName = req.body.playerName;
+  app.observer.registerPlayer(newPlayerName,function(e,s){
+    if(e){
+      console.error(e);
+      res.status(500).send('Something broke!');
+    }
+    else{
+      console.log(s);
+      res.render('playersRoom',{playerName:newPlayerName});
+    }
+  });
 });
 
 // catch 404 and forward to error handler

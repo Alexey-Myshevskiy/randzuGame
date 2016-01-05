@@ -7,7 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('randzuGame:server');
 var http = require('http');
-
+var mymodule = require('./processesObserver');
 /**
  * Get port from environment and store in Express.
  */
@@ -20,7 +20,9 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
-
+var io = require('socket.io')(server);
+app.io=io;
+app.observer = mymodule;
 /**
  * Listen on provided port, on all network interfaces.
  */
