@@ -8,29 +8,42 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
 // add linear gradient
     var grd = context.createLinearGradient(0, 0, 0, canvas.height);
-// light blue
+
     grd.addColorStop(0, '#ffcc99');//'#ffbf80'||#ff9966
-// dark blue
+
     grd.addColorStop(1, '#ffe5cc');//'#ffe5cc'||#ffddcc
     context.fillStyle = grd;
     context.fill();
-    // draw vertical lines
-    var Ystep = 60;
-    for (var a = 0; a < 14; a++) {
-        drawLine(context, canvas.width, a + Ystep, 0);
-        Ystep += 60;
-    }
-    // draw vertical lines
-    var Xstep = 60;
-    for (var b = 0; b < 14; b++) {
-        drawLine(context, canvas.width, 0, b + Xstep);
-        Xstep += 60;
-    }
+    // draw grid
+    var opts = {
+        distance: 50,
+        lineWidth: 1,
+        gridColor: "#081400",
+        caption: false,
+        horizontalLines: true,
+        verticalLines: true
+    };
+    new Grid(opts).draw(context);
+    canvas.addEventListener("mousedown",function(event){getPosition(canvas,event)});
 });
-function drawLine(context, line_length, x, y) {
-    context.beginPath();
-    context.moveTo(x, y);
-    if(x)context.lineTo(x,line_length);
-    if(y)context.lineTo(line_length,y);
-    context.stroke();
-}
+    function getPosition(canvas, event) {
+        var rect = canvas.getBoundingClientRect();
+        var x = event.clientX - rect.left;
+        var y = event.clientY - rect.top;
+        var coor1= x % 50, coor2 = y % 50;
+        if (coor1 <= 5 && coor2 <= 5) {
+            drawFishka(canvas, (x-coor1), (y-coor2));
+        }
+    }
+
+    function drawFishka(canvas, X, Y, type) {
+        var context = canvas.getContext('2d');
+        var radius = 10;
+        context.beginPath();
+        context.arc(X, Y, radius, 0, 2 * Math.PI, false);
+        context.fillStyle = 'green';
+        context.fill();
+        context.lineWidth = 5;
+        context.strokeStyle = '#003300';
+        context.stroke();
+    }

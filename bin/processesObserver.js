@@ -3,7 +3,7 @@
  */
 var mySingleton = (function () {
     var Storage = require("node-cache");
-    var PlayersStore = new Storage();
+    var PlayersStore = new Storage({ stdTTL: 15*60, checkperiod: 120 });
     // Instance stores a reference to the Singleton
     var instance;
 
@@ -19,7 +19,7 @@ var mySingleton = (function () {
                         if (value == undefined) {
                             // if data with provided key is not exist
                             // save period 15 min (900 000 msec)
-                            PlayersStore.set(name, {playerName: name}, 900000, callback);
+                            PlayersStore.set(name, {playerName: name},10*60, callback);
                         } else {
                             callback("Duplicate was found!", null);
                         }

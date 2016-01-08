@@ -23,10 +23,10 @@ app.get('/', function(req, res) {
   res.render('index',{pCount:app.observer.countOfPlayers()});
 });
 app.get('/checkName',function(req,res){
-  setTimeout(function() {
+
     var is = app.observer.isExistPlayer(req.query.name);
     res.status(200).jsonp({isExist:is})
-  }, 3*1000);
+
 });
 app.post('/players-room',function(req,res){
 /*  app.io.on('connection', function(socket){
@@ -42,16 +42,18 @@ app.post('/players-room',function(req,res){
   var newPlayerName = req.body.playerName;
   app.observer.registerPlayer(newPlayerName,function(e,s){
     if(e){
-      console.error(e);
       res.status(500).send('Something broke!');
     }
     else{
-      console.log(s);
       res.render('playersRoom',{playerName:newPlayerName});
     }
   });
 });
-
+// expect /play?type=cp&pname=Vasya
+app.get('/play',function(req,res){
+  res.location('/foo/bar');
+  res.render('gamefield',{playerName:req.query.pname});
+});
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
