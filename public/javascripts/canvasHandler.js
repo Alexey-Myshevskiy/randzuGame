@@ -27,12 +27,16 @@ document.addEventListener("DOMContentLoaded", function (event) {
     canvas.addEventListener("mousedown",function(event){getPosition(canvas,event)});
 });
     function getPosition(canvas, event) {
+        var data={};
         var rect = canvas.getBoundingClientRect();
         var x = event.clientX - rect.left;
         var y = event.clientY - rect.top;
         var coor1= x % 50, coor2 = y % 50;
         if (coor1 <= 5 && coor2 <= 5) {
-            drawFishka(canvas, (x-coor1), (y-coor2));
+            data.X=x-coor1;
+            data.Y=y-coor1;
+            socket.emit("step",data);
+            drawFishka(canvas,data.X,data.Y,'pl');
         }
     }
 
@@ -41,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
         var radius = 10;
         context.beginPath();
         context.arc(X, Y, radius, 0, 2 * Math.PI, false);
-        context.fillStyle = 'green';
+        context.fillStyle = (type=='pl') ? 'green':'white';
         context.fill();
         context.lineWidth = 5;
         context.strokeStyle = '#003300';
