@@ -14,30 +14,43 @@
     <script>
         var socket = io(window.location.origin);
         socket.on('cpu_step', function (data) {
-            drawFishka(document.getElementById('field'),data.X,data.Y,'cpu')
+            drawFishka(document.getElementById('field'), data.X, data.Y, 'cpu')
         });
-   player.startPlay();
-          //----------- control buttons handlers -----------------//
-          function stopPlayBtn(element){
+        socket.on('victory', function (data) {
+            drawFishka(document.getElementById('field'), data.coords.X, data.coords.Y, 'cpu');
+            var content;
+            switch (data.winner) {
+                case 'cpu':
+                    content = "<div class='alert alert-warning' role='alert'><h3>Вы проиграли</h3></div>";
+                    break;
+                case 'usr':
+                    content = "<div class='alert alert-success' role='alert'><h3>Вы выиграли</h3></div>";
+                    break;
+            }
+            document.getElementById('modalContainer').innerHTML = content;
+            $('.bs-example-modal-lg').modal('show');
+        });
+        player.startPlay();
+        //----------- control buttons handlers -----------------//
+        function stopPlayBtn(element) {
             var Element = element;
             var textElement = Element.text();
-            var variants = ['Выключить звук','Включить звук'];
-            if(textElement.trim()==variants[0])
-            {
+            var variants = ['Выключить звук', 'Включить звук'];
+            if (textElement.trim() == variants[0]) {
                 Element.replaceWith(
-                "<button id='playStop' type='button' class='btn btn-default' onclick='stopPlayBtn($(this))'>"+
-                "<span class='glyphicon glyphicon-volume-up' aria-hidden='true'></span>\t"+variants[1]+"</button>");
-               // playlist().getCurrentTrack().pause();
-               player.stopPlay();
+                        "<button id='playStop' type='button' class='btn btn-default' onclick='stopPlayBtn($(this))'>" +
+                        "<span class='glyphicon glyphicon-volume-up' aria-hidden='true'></span>\t" + variants[1] + "</button>");
+                // playlist().getCurrentTrack().pause();
+                player.stopPlay();
             }
-            else{
-                 Element.replaceWith(
-                "<button id='playStop' type='button' class='btn btn-default' onclick='stopPlayBtn($(this))'>"+
-                "<span class='glyphicon glyphicon-volume-off' aria-hidden='true'></span>\t"+variants[0]+"</button>");
+            else {
+                Element.replaceWith(
+                        "<button id='playStop' type='button' class='btn btn-default' onclick='stopPlayBtn($(this))'>" +
+                        "<span class='glyphicon glyphicon-volume-off' aria-hidden='true'></span>\t" + variants[0] + "</button>");
                 //sound.play();
                 player.continuePlay();
             }
-          }
+        }
     </script>
 </head>
 <body>
@@ -78,6 +91,24 @@
     </div>
     <div class="col-lg-2 col-mg-2 col-sm-1" style="border: 1px solid red">
         gdfg
+    </div>
+</div>
+<!--                     constraint a modal message -->
+<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="strong">RandZU</h4>
+                    <div class="modal-body" id="modalContainer">
+                        <!-- message -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 </body>

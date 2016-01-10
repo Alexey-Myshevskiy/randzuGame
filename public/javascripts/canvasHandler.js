@@ -33,11 +33,10 @@ document.addEventListener("DOMContentLoaded", function (event) {
         var y = event.clientY - rect.top;
         var coor1= x % 50, coor2 = y % 50;
         if (coor1 <= 5 && coor2 <= 5) {
-            data.X=x-coor1;
-            data.Y=y-coor2;
-//            console.log("X:"+data.X+"Y:"+data.Y);
+            data.X=(x-coor1)/50;
+            data.Y=(y-coor2)/50;
             socket.emit("step",data);
-            drawFishka(canvas,data.X,data.Y,'pl');
+            drawFishka(canvas,x-coor1,y-coor2,'pl');
         }
     }
 

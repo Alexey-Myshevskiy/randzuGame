@@ -36,7 +36,8 @@ app.post('/players-room', function (req, res) {
         game = new Game();
         socket.on("step", function (data) {
             var answ = game.registerStep(data.X,data.Y);
-            socket.emit("cpu_step",answ);
+            if(answ.winner) socket.emit("victory",answ);
+            else socket.emit("cpu_step",answ);
         });
         socket.on('disconnect', function () {
             console.log('Got disconnect!');
