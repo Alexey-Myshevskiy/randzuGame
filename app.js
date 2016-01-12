@@ -28,17 +28,20 @@ app.get('/checkName', function (req, res) {
 });
 app.post('/players-room', function (req, res) {
     var newPlayerName = req.body.playerName;
-    res.render('playersRoom', {playerName: newPlayerName});
+    var countOfRooms=app.observer.countOfWaitingRooms();
+    res.render('playersRoom', {playerName: newPlayerName,waitingRooms:countOfRooms});
 });
 app.get('/players-room/:name', function (req, res) {
-    res.render('playersRoom', {playerName: req.params.name});
+    var countOfRooms=app.observer.countOfWaitingRooms();
+    res.render('playersRoom', {playerName: req.params.name,waitingRooms:countOfRooms});
 });
 // expect /play?type=cp&pname=Vasya
 app.post('/play', function (req, res) {
     var gameType = req.body.gametype;
     var playerName = req.body.pname;
     var Game = require('./bin/gameEngine');
-    var listOfGames={};
+    var listOfGames = {};
+
     app.io.on('connection', function (socket) {
 
         socket.on("readyToplay", function (player) {
@@ -69,25 +72,27 @@ app.post('/play', function (req, res) {
                 });
             }
         });
+        if (gameType == 'cp') {
 
+            socket.on("step", function (id, data) {
+                var answ = listOfGames[id].iteract(data.X, data.Y);
+                if (answ.winner) app.io.to(id).emit("victory", answ);
+                else app.io.to(id).emit("cpu_step", answ);
+            });
+        } else if (gameType == 'pl') {
+            socket.join(playerName);
+            app.observer.addWaitingRoom(playerName);
+        }
+        else res.sendStatus(400);
 
-        socket.on("step", function (id,data) {
-            var answ = listOfGames[id].iteract(data.X, data.Y);
-            if (answ.winner) app.io.to(id).emit("victory", answ);
-            else app.io.to(id).emit("cpu_step", answ);
-        });
         socket.on('disconnect', function () {
-           //TODO: maybe need to add handler of this situation
+            //TODO: maybe need to add handler of this situation
         });
         socket.on('addedPlayer', function () {
-        //TODO: need something do with this
+            //TODO: need something do with this
         });
     });
-    if (gameType == 'cp')res.render('gamefield', {playerName: playerName});
-    if (gameType == 'pl') {
-        res.render('gamefield', {playerName: playerName, seekToGame: true});
-    }
-    else res.sendStatus(400);
+    res.render('gamefield', {playerName: playerName});
 });
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

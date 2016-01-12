@@ -40,7 +40,10 @@
         <form method="post" action="/play">
             <input name="gametype" value="pl" hidden>
             <input name="pname" value="<%= playerName %>" hidden>
-            <button id="playCPU" type="submit" class="btn btn-success btn-lg">Играть с другими игроками</button>
+
+            <button id="playCPU" type="submit" class="btn btn-success btn-lg">Играть с другими игроками
+            <% if(waitingRooms>0){%><span class="badge"><%= waitingRooms %><%}%>
+            </button>
         </form>
     </div>
 </div>

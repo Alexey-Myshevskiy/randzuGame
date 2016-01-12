@@ -42,6 +42,18 @@ var mySingleton = (function () {
                 var Player=this.getPlayerByName(usrName);
                 Player.game=GameObj;
                 PlayersStore.set(Player.playerName,Player,10*60);
+            },
+            addWaitingRoom:function(name){
+                PlayersStore.set(name,{type:'waitingRoom',roomName:name},10*60);
+            },
+            countOfWaitingRooms:function(){
+                var content=PlayersStore.keys();
+                var count=0;
+                content.forEach(function(item,index,array){
+                    entity=PlayersStore.get(item);
+                   if(entity.type=='waitingRoom')  count++;
+                });
+                return count;
             }
         };
     };
