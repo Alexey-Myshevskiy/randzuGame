@@ -41,3 +41,15 @@ var player = {
         }
     }
 };
+var soundEffect = {
+    play:function(){
+        var sound = new Howl({
+            urls: ['/sounds/s1.wav'],
+            volume: 0.4,
+            sprite: {
+                stones: [5000, 5700]
+            }
+        });
+        sound.play('stones');
+    }
+};

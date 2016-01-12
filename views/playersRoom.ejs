@@ -6,34 +6,41 @@
     <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
+
 </head>
 <body>
 <div class="jumbotron">
     <h1 class="text-center">Добро пожаловать <%= playerName %></h1>
     <div class="instruction">
-    <h2 class="instruction">Правила игры RandZU</h2>
-    <h3 class="instruction">Основные правила</h3>
-    <h4 class="instruction">
-        <p class="lead">
-            Играют два соперника: один чёрными фишками (камнями), другой — белыми.
-            Игра проходит на расчерченной в клетку доске размером 15 на 15 линий.
-        </p>
-        <p class="lead">
-            Игроки делают ходы по очереди. Первыми ходят чёрные.
-            Каждым ходом игрок выставляет на доску в любое свободное пересечение линий доски один камень своего цвета.
-        </p>
-        <p class="lead">
-            Побеждает тот, кто сможет первым построить непрерывный ряд из пяти камней своего цвета — по горизонтали,
-            по вертикали или в диагональном направлении.
-        </p>
-    </h4>
+        <h2 class="instruction">Правила игры RandZU</h2>
+        <h3 class="instruction">Основные правила</h3>
+        <h4 class="instruction">
+            <p class="lead">
+                Играют два соперника: один чёрными фишками (камнями), другой — белыми.
+                Игра проходит на расчерченной в клетку доске размером 15 на 15 линий.
+            </p>
+            <p class="lead">
+                Игроки делают ходы по очереди. Первыми ходят чёрные.
+                Каждым ходом игрок выставляет на доску в любое свободное пересечение линий доски один камень своего
+                цвета.
+            </p>
+            <p class="lead">
+                Побеждает тот, кто сможет первым построить непрерывный ряд из пяти камней своего цвета — по горизонтали,
+                по вертикали или в диагональном направлении.
+            </p>
+        </h4>
     </div>
     <div class="text-center">
-        <form action="/play?type=cp&pname=<%= playerName %>" method="get">
+        <form method="post" action="/play">
+            <input name="gametype" value="cp" hidden>
+            <input name="pname" value="<%= playerName %>" hidden>
             <button id="playCPU" type="submit" class="btn btn-success btn-lg">Играть с компъютером</button>
         </form>
-        <form action="/play?type=pl&pname=<%= playerName %>" method="get">
-            <button id="playPL" type="submit" class="btn btn-success btn-lg">Играть с другими игроками</button>
+        <form method="post" action="/play">
+            <input name="gametype" value="pl" hidden>
+            <input name="pname" value="<%= playerName %>" hidden>
+            <button id="playCPU" type="submit" class="btn btn-success btn-lg">Играть с другими игроками</button>
         </form>
     </div>
 </div>

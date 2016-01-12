@@ -35,7 +35,9 @@ document.addEventListener("DOMContentLoaded", function (event) {
         if (coor1 <= 5 && coor2 <= 5) {
             data.X=(x-coor1)/50;
             data.Y=(y-coor2)/50;
-            socket.emit("step",data);
+            id=socket.id;
+            socket.emit("step",id,data);
+            soundEffect.play();
             drawFishka(canvas,x-coor1,y-coor2,'pl');
         }
     }

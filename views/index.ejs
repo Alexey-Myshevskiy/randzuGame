@@ -65,7 +65,7 @@
             }
             var value = $("#pName").val();
             $.ajax({
-                url: "http://localhost:3000/checkName?name=" + value,
+                url: window.location.origin+"/checkName?name=" + value,
                 success: function (result) {
                     if (!result.isExist) {
                         $("form").submit();

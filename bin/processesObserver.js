@@ -6,20 +6,19 @@ var mySingleton = (function () {
     var PlayersStore = new Storage({ stdTTL: 15*60, checkperiod: 120 });
     // Instance stores a reference to the Singleton
     var instance;
-
     function init() {
         // Singleton
         // Private methods and variables
 
         return {
             // Public methods and variables
-            registerPlayer: function (name, callback) {
-                PlayersStore.get(name, function (err, value) {
+            registerPlayer: function (obj, callback) {
+                PlayersStore.get(obj, function (err, value) {
                     if (!err) {
                         if (value == undefined) {
                             // if data with provided key is not exist
                             // save period 15 min (900 000 msec)
-                            PlayersStore.set(name, {playerName: name},10*60, callback);
+                            PlayersStore.set(obj.playerName,obj,10*60, callback);
                         } else {
                             callback("Duplicate was found!", null);
                         }
@@ -29,8 +28,8 @@ var mySingleton = (function () {
                     }
                 });
             },// end PlayersStore declaration
-            getPlayers: function(callback){
-                PlayersStore.keys(callback);
+            getPlayerByName: function(name){
+                return PlayersStore.get(name);
             },
             countOfPlayers: function(){
                 return PlayersStore.keys().length;
@@ -38,6 +37,11 @@ var mySingleton = (function () {
             isExistPlayer: function(name){
                 value = PlayersStore.get(name);
                 return ( value == undefined ) ? false : true;
+            },
+            addGameToUser:function(usrName,GameObj){
+                var Player=this.getPlayerByName(usrName);
+                Player.game=GameObj;
+                PlayersStore.set(Player.playerName,Player,10*60);
             }
         };
     };
