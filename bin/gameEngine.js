@@ -3,11 +3,11 @@ function Game() {
     userSq = 1;
     machSq = -1;
     this.myTurn = false;
-    this.flag=0;
+    this.flag = 0;
     winningMove = 9999999;
     openFour = 8888888;
     twoThrees = 7777777;
-    this.data={};
+    this.data = {};
     this.f = new Array();
     this.s = new Array();
     this.q = new Array();
@@ -31,12 +31,12 @@ function Game() {
 
         if (this.winningPos(X, Y, userSq) == winningMove) {
             // We have Winner
-            this.data.winner='usr';
-            this.data.messge='вы выиграли';
-            this.data.coords={X:X*50,Y:Y*50};
+            this.data.winner = 'usr';
+            this.data.messge = 'вы выиграли';
+            this.data.coords = {X: X * 50, Y: Y * 50};
         }
         else {
-          return  this.Iimove(this.iLastUserMove, this.jLastUserMove);
+            return this.Iimove(this.iLastUserMove, this.jLastUserMove);
         }
     };
 
@@ -81,6 +81,22 @@ function Game() {
             this.myTurn = false;
         }
         return this.data;
+    };
+
+    this.goStep = function (X,Y,enemySET) {
+        this.f[X][Y] = userSq;
+        winner = (this.winningPos(X, Y,userSq)== winningMove);
+        if(winner){
+            return 'winner';
+        }
+        else if(Object.keys(enemySET).length>0){
+            his.f[enemySET.X][enemySET.Y] = machSq;
+            winner = (this.winningPos(enemySET.X, enemySET.Y,machSq)== winningMove);
+            return winner ? 'youLoose':'continue';
+        }
+        else{
+            return 'continue';
+        }
     };
     this.hasNeighbors = function (i, j) {
         if (j > 0 && this.f[i][j - 1] != 0) return 1;
@@ -330,4 +346,4 @@ function Game() {
     };
     return this;
 };
-module.exports=Game;
+module.exports = Game;

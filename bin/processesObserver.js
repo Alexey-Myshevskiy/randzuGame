@@ -3,9 +3,10 @@
  */
 var mySingleton = (function () {
     var Storage = require("node-cache");
-    var PlayersStore = new Storage({ stdTTL: 15*60, checkperiod: 120 });
+    var PlayersStore = new Storage({stdTTL: 15 * 60, checkperiod: 120});
     // Instance stores a reference to the Singleton
     var instance;
+
     function init() {
         // Singleton
         // Private methods and variables
@@ -13,14 +14,14 @@ var mySingleton = (function () {
         return {
             // Public methods and variables
             registerPlayer: function (obj, callback) {
-                PlayersStore.get(obj, function (err, value) {
+                PlayersStore.get(obj.playerName, function (err, value) {
                     if (!err) {
                         if (value == undefined) {
                             // if data with provided key is not exist
                             // save period 15 min (900 000 msec)
-                            PlayersStore.set(obj.playerName,obj,10*60, callback);
+                            PlayersStore.set(obj.playerName, obj, 10 * 60, callback);
                         } else {
-                            callback("Duplicate was found!", null);
+                            callback("Duplicate STOP!", null);
                         }
                     }
                     else {
@@ -28,32 +29,47 @@ var mySingleton = (function () {
                     }
                 });
             },// end PlayersStore declaration
-            getPlayerByName: function(name){
+            getPlayerByName: function (name) {
                 return PlayersStore.get(name);
             },
-            countOfPlayers: function(){
-                return PlayersStore.keys().length;
+            countOfPlayers: function () {
+                var count = 0;
+                var keys = PlayersStore.keys();
+                keys.forEach(function (item, index, array) {
+                    if (keys[index].indexOf('_room') < 0)  count++;// if entity not a room
+                });
+                return count;
             },
-            isExistPlayer: function(name){
+            isExistPlayer: function (name) {
                 value = PlayersStore.get(name);
                 return ( value == undefined ) ? false : true;
             },
-            addGameToUser:function(usrName,GameObj){
-                var Player=this.getPlayerByName(usrName);
-                Player.game=GameObj;
-                PlayersStore.set(Player.playerName,Player,10*60);
+            addGameToUser: function (usrName, GameObj) {
+                var Player = this.getPlayerByName(usrName);
+                Player.game = GameObj;
+                PlayersStore.set(Player.playerName, Player, 10 * 60);
             },
-            addWaitingRoom:function(name){
-                PlayersStore.set(name,{type:'waitingRoom',roomName:name},10*60);
+            addWaitingRoom: function (roomObj) {
+                PlayersStore.set(roomObj.name, roomObj, 4 * 60);
             },
-            countOfWaitingRooms:function(){
-                var content=PlayersStore.keys();
-                var count=0;
-                content.forEach(function(item,index,array){
-                    entity=PlayersStore.get(item);
-                   if(entity.type=='waitingRoom')  count++;
+            countOfWaitingRooms: function () {
+                var content = PlayersStore.keys();
+                var count = 0;
+                content.forEach(function (item, index, array) {
+                    if (content[index].indexOf('_room') > 0)  count++;
                 });
                 return count;
+            },
+            getFreeRoom: function () {
+                var allKeys = PlayersStore.keys();
+                var currentArray = allKeys.filter(function (item, index, array) {
+                    return item.indexOf('_room')>0;
+                });
+                var name = currentArray[Math.floor(Math.random() * currentArray.length)];
+                return PlayersStore.get(name);
+            },
+            removeFreeRoom: function(name,callback) {
+                PlayersStore.del(name,callback);
             }
         };
     };

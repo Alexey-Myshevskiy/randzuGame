@@ -1,6 +1,28 @@
 /**
  * Created by alexey on 02.01.16.
  */
+setOfField={};
+iter=0;
+function getPosition(event) {
+    var data={};
+    var rect = event.target.getBoundingClientRect();
+    var x = event.clientX - rect.left;
+    var y = event.clientY - rect.top;
+    var coor1= x % 50, coor2 = y % 50;
+    if (coor1 <= 5 && coor2 <= 5) {
+        data.X=(x-coor1)/50;
+        data.Y=(y-coor2)/50;
+
+        soundEffect.play();
+        drawFishka(event.target,x-coor1,y-coor2,'pl',function(){
+            id=socket.id;
+            if(iter==0) socket.emit("step",id,data);
+            else socket.emit("step",id,data,setOfField[iter]);
+            iter++;
+            setOfField[iter]=data.X+":"+data.Y;
+        });
+    }
+};
 document.addEventListener("DOMContentLoaded", function (event) {
     var canvas = document.getElementById("field");
     var context = canvas.getContext('2d');
@@ -24,25 +46,9 @@ document.addEventListener("DOMContentLoaded", function (event) {
         verticalLines: true
     };
     new Grid(opts).draw(context);
-    canvas.addEventListener("mousedown",function(event){getPosition(canvas,event)});
+    canvas.addEventListener("mousedown",getPosition);
 });
-    function getPosition(canvas, event) {
-        var data={};
-        var rect = canvas.getBoundingClientRect();
-        var x = event.clientX - rect.left;
-        var y = event.clientY - rect.top;
-        var coor1= x % 50, coor2 = y % 50;
-        if (coor1 <= 5 && coor2 <= 5) {
-            data.X=(x-coor1)/50;
-            data.Y=(y-coor2)/50;
-            id=socket.id;
-            socket.emit("step",id,data);
-            soundEffect.play();
-            drawFishka(canvas,x-coor1,y-coor2,'pl');
-        }
-    }
-
-    function drawFishka(canvas, X, Y, type) {
+    function drawFishka(canvas, X, Y, type,callback) {
         var context = canvas.getContext('2d');
         var radius = 10;
         context.beginPath();
@@ -52,4 +58,5 @@ document.addEventListener("DOMContentLoaded", function (event) {
         context.lineWidth = 5;
         context.strokeStyle = '#003300';
         context.stroke();
+        callback();
     }

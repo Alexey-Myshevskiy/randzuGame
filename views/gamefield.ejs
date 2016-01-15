@@ -14,10 +14,25 @@
     <script>
         var socket = io(window.location.origin);
         var timerID;
-        var playerName="<%= playerName%>";
-        socket.emit('readyToplay',playerName,function (data) {
-           // something
+        var playerName="<%= playerName %>";
+        var gameType="<%= gameType %>";
+        socket.on('connect', function () {
+        socket.emit('readyToplay',{playerName:playerName,gameType:gameType});
+        socket.on('intial_step',function(player){
+            if(player==playerName){
+                console.log("Ваш ход")
+            }
+            else{
+                document.getElementById("field").removeEventListener('mousedown',getPosition);
+                console.log("Ходит соперник");
+            }
         });
+
+         socket.on("competitor_step", function (coords){
+             console.log("fefw");
+             drawFishka(document.getElementById('field'), coords.X, coords.Y, 'cpu');
+         });
+
         socket.on('cpu_step', function (data) {
 
             drawFishka(document.getElementById('field'), data.X, data.Y, 'cpu')
@@ -42,6 +57,7 @@
             $('.bs-example-modal-lg').on('hidden.bs.modal', function (event) {
                 window.location.href='/players-room/'+playerName;
             });
+        });
         });
         player.startPlay();
         timerID=startTime(0,0);

@@ -6,7 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var app = express();
-
+app.io = require('socket.io')();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -22,77 +22,119 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', function (req, res) {
     res.render('index', {pCount: app.observer.countOfPlayers()});
 });
+app.io.on('connection', function (socket) {
+    var listOfGames = {};
+    var Game = require('./bin/gameEngine');
+    var gameType;
+    socket.on('playWithOthers', function (data) {
+        if (app.observer.countOfWaitingRooms() == 0) {
+            app.observer.addWaitingRoom({
+                id: socket.id,
+                name: data.playerName + "_room",
+                type: 'waitingRoom',
+                roomName: data.playerName
+            });
+            app.io.emit("waitForPlayers", {});
+        }
+        else {
+            app.io.emit("goPlay", {});
+        }
+    });
+
+    socket.on("readyToplay", function (data) {
+        // Если игрок играл и его игра не завершена
+     gameType=data.gameType;
+        if (app.observer.isExistPlayer(data.playerName)) {
+
+            Player = app.observer.getPlayerByName(data.playerName);
+            PlayersGme = Player.game;
+            if (PlayersGme) {
+                listOfGames[socket.id] = PlayersGme;
+            }
+            else {
+                listOfGames[socket.id] = new Game();
+            }
+        }
+        else {// Если игрок зашел впервые
+            app.observer.registerPlayer({playerName: data.playerName}, function (e, s) {
+                if (e) {
+                    res.status(500).send('Something broke!');
+                }
+                else {
+                    //socket.emit("addedPlayer", {playerName: newPlayerName});
+                    var game = new Game();
+                    app.observer.addGameToUser(data.playerName, game);
+                    listOfGames[socket.id] = game;
+                    //newPlayerName="";
+                }
+            });
+        }
+        if (gameType == 'cp') {
+            socket.on("step", function (id, data) {
+                var answ = listOfGames[id].iteract(data.X, data.Y);
+                if (answ.winner) app.io.to(id).emit("victory", answ);
+                else app.io.to(id).emit("cpu_step", answ);
+            });
+        } else {// ######################################
+            var room;
+            room = app.observer.getFreeRoom();
+            var clients = app.io.sockets.adapter.rooms[room];
+            //to get the number of clients
+            var numClients = (typeof clients !== 'undefined') ? Object.keys(clients).length : 0;
+            if (numClients == 2) {
+                app.observer.removeFreeRoom(room.name, function (err, del) {
+                    if (err) console.log(err);
+                });
+            }
+            else {
+                socket.join(room.name);
+                app.io.to(room.name).emit('intial_step', room.roomName);
+            }
+            socket.on("step", function (id,myCoordinates,competitor) {
+                var room=app.io.sockets.adapter.sids[id];
+                if(arguments.length==2) app.io.to(room).emit('competitor_step',myCoordinates);
+                console.log(competitor);
+            });
+        }
+    });// /readyToplay
+
+
+    socket.on('disconnect', function () {
+        //TODO: maybe need to add handler of this situation
+    });
+    socket.on('addedPlayer', function () {
+        //TODO: need something do with this
+    });
+});
 app.get('/checkName', function (req, res) {
     var is = app.observer.isExistPlayer(req.query.name);
     res.status(200).jsonp({isExist: is})
 });
 app.post('/players-room', function (req, res) {
     var newPlayerName = req.body.playerName;
-    var countOfRooms=app.observer.countOfWaitingRooms();
-    res.render('playersRoom', {playerName: newPlayerName,waitingRooms:countOfRooms});
+    app.observer.registerPlayer({playerName: newPlayerName}, function (err, success) {
+        if (err) {
+            res.status(500).send('Something broke!');
+        }
+        else {
+            var countOfRooms = app.observer.countOfWaitingRooms();
+            res.render('playersRoom', {playerName: newPlayerName, waitingRooms: countOfRooms});
+        }
+    });
 });
 app.get('/players-room/:name', function (req, res) {
-    var countOfRooms=app.observer.countOfWaitingRooms();
-    res.render('playersRoom', {playerName: req.params.name,waitingRooms:countOfRooms});
+    var countOfRooms = app.observer.countOfWaitingRooms();
+    res.render('playersRoom', {playerName: req.params.name, waitingRooms: countOfRooms});
 });
 // expect /play?type=cp&pname=Vasya
 app.post('/play', function (req, res) {
     var gameType = req.body.gametype;
     var playerName = req.body.pname;
-    var Game = require('./bin/gameEngine');
-    var listOfGames = {};
+/*    app.io.on('connection', function (socket) {
 
-    app.io.on('connection', function (socket) {
 
-        socket.on("readyToplay", function (player) {
-            // Если игрок играл и его игра не завершена
-            if (app.observer.isExistPlayer(player)) {
-
-                Player = app.observer.getPlayerByName(player);
-                PlayersGme = Player.game;
-                if (PlayersGme) {
-                    listOfGames[socket.id] = PlayersGme;
-                }
-                else {
-                    listOfGames[Player.id] = new Game();
-                }
-            }
-            else {// Если игрок зашел впервые
-                app.observer.registerPlayer({playerName: player}, function (e, s) {
-                    if (e) {
-                        res.status(500).send('Something broke!');
-                    }
-                    else {
-                        //socket.emit("addedPlayer", {playerName: newPlayerName});
-                        var game = new Game();
-                        app.observer.addGameToUser(player, game);
-                        listOfGames[socket.id] = game;
-                        //newPlayerName="";
-                    }
-                });
-            }
-        });
-        if (gameType == 'cp') {
-
-            socket.on("step", function (id, data) {
-                var answ = listOfGames[id].iteract(data.X, data.Y);
-                if (answ.winner) app.io.to(id).emit("victory", answ);
-                else app.io.to(id).emit("cpu_step", answ);
-            });
-        } else if (gameType == 'pl') {
-            socket.join(playerName);
-            app.observer.addWaitingRoom(playerName);
-        }
-        else res.sendStatus(400);
-
-        socket.on('disconnect', function () {
-            //TODO: maybe need to add handler of this situation
-        });
-        socket.on('addedPlayer', function () {
-            //TODO: need something do with this
-        });
-    });
-    res.render('gamefield', {playerName: playerName});
+    });*/
+    res.status(200).render('gamefield', {playerName: playerName,gameType:gameType});
 });
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
