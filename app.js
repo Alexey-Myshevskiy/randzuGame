@@ -43,7 +43,7 @@ app.io.on('connection', function (socket) {
 
     socket.on("readyToplay", function (data) {
         // Если игрок играл и его игра не завершена
-     gameType=data.gameType;
+        gameType = data.gameType;
         if (app.observer.isExistPlayer(data.playerName)) {
 
             Player = app.observer.getPlayerByName(data.playerName);
@@ -90,10 +90,24 @@ app.io.on('connection', function (socket) {
                 socket.join(room.name);
                 app.io.to(room.name).emit('intial_step', room.roomName);
             }
-            socket.on("step", function (id,myCoordinates,competitor) {
-                var room=app.io.sockets.adapter.sids[id];
-                if(arguments.length==2) app.io.to(room).emit('competitor_step',myCoordinates);
-                console.log(competitor);
+            socket.on("step", function (id, myCoordinates, competitor) {
+                var room = Object.keys(app.io.sockets.adapter.sids[id])[1];
+                if (arguments.length == 2) {
+                    socket.broadcast.to(room).emit('competitor_step', myCoordinates);
+                }
+                else {
+                    answer=listOfGames[id].goStep(myCoordinates.X,myCoordinates.Y);
+                    if(answer=='winner'){
+                        console.log('winner');
+                        socket.broadcast.to(room).emit('competitor_step', myCoordinates);
+                    }
+                    if(answer=='continue'){
+                        socket.broadcast.to(room).emit('competitor_step', myCoordinates);
+                    }
+                }
+            });
+            socket.on("answ", function (player) {
+                app.io.to(room.name).emit('intial_step',player);
             });
         }
     });// /readyToplay
@@ -130,11 +144,11 @@ app.get('/players-room/:name', function (req, res) {
 app.post('/play', function (req, res) {
     var gameType = req.body.gametype;
     var playerName = req.body.pname;
-/*    app.io.on('connection', function (socket) {
+    /*    app.io.on('connection', function (socket) {
 
 
-    });*/
-    res.status(200).render('gamefield', {playerName: playerName,gameType:gameType});
+     });*/
+    res.status(200).render('gamefield', {playerName: playerName, gameType: gameType});
 });
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

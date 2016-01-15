@@ -87,13 +87,14 @@ function Game() {
         this.f[X][Y] = userSq;
         winner = (this.winningPos(X, Y,userSq)== winningMove);
         if(winner){
+            console.log(f);
             return 'winner';
         }
-        else if(Object.keys(enemySET).length>0){
+/*        else if(Object.keys(enemySET).length>0){
             his.f[enemySET.X][enemySET.Y] = machSq;
             winner = (this.winningPos(enemySET.X, enemySET.Y,machSq)== winningMove);
             return winner ? 'youLoose':'continue';
-        }
+        }*/
         else{
             return 'continue';
         }

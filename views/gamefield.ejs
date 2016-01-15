@@ -17,9 +17,10 @@
         var playerName="<%= playerName %>";
         var gameType="<%= gameType %>";
         socket.on('connect', function () {
-        socket.emit('readyToplay',{playerName:playerName,gameType:gameType});
+            socket.emit('readyToplay',{playerName:playerName,gameType:gameType});
         socket.on('intial_step',function(player){
             if(player==playerName){
+                document.getElementById("field").addEventListener('mousedown',getPosition);
                 console.log("Ваш ход")
             }
             else{
@@ -29,8 +30,9 @@
         });
 
          socket.on("competitor_step", function (coords){
-             console.log("fefw");
-             drawFishka(document.getElementById('field'), coords.X, coords.Y, 'cpu');
+             drawFishka(document.getElementById('field'), (coords.X*50),(coords.Y*50), 'cpu',function(){
+                 socket.emit('answ',playerName);
+             });
          });
 
         socket.on('cpu_step', function (data) {
