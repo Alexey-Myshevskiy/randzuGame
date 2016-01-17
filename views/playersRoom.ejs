@@ -10,19 +10,33 @@
     <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
     <script>
         $(function () {
+            player="<%= playerName %>";
+            emiter=false;
             var socket = io(window.location.origin);
             $('#playPL').click(function () {
-                socket.emit('playWithOthers', {playerName: "<%= playerName %>", gametype: "pl"});
+                emiter=true;
+                socket.emit('playWithOthers', {playerName:player , gametype: "pl"});
                 var button = $('#playPL');
                 button.html('<i class="fa fa-spinner fa-spin"></i>&nbsp&nbspОжидание других игроков');
+                button.attr("disabled","disabled");
             });
             socket.on('waitForPlayers', function (data) {
+                if(emiter){
                 $('#playPL').tooltip({
                     placement: 'right', trigger: 'manual',
                     title: 'Вы можете подождать, либо начать игру с компъютером'
                 }).tooltip('show');
+                  //  $('#playPL').attr("disabled","disabled");
+                $("#plh").val(data);
+                }
+                else{
+                    $('#playPL').append("<span class='badge'>1</span>");
+                }
             });
             socket.on('goPlay',function (data) {
+              //  (player==data); ?
+                var v=$("#plh").val();
+                 $("#plh").val(data);
                 $('#playPLform').submit();
             });
 
@@ -56,15 +70,17 @@
         <form method="post" action="/play">
             <input name="gametype" value="cp" hidden>
             <input name="pname" value="<%= playerName %>" hidden>
+            <input id="cph" name="competitorName" value="CPU" hidden>
             <button id="playCPU" type="submit" class="btn btn-success btn-lg">Играть с компъютером</button>
         </form>
         <form method="post" action="/play" id="playPLform">
             <input name="gametype" value="pl" hidden>
             <input name="pname" value="<%= playerName %>" hidden>
+            <input id="plh" name="competitorName" value="" hidden>
         </form>
         <button id="playPL" type="button" class="btn btn-success btn-lg">Играть с другими игроками
             <% if(waitingRooms > 0){ %>
-            <span class="badge"><%= waitingRooms %>
+            <span class="badge"><%= waitingRooms %></span>
                 <% } %>
         </button>
     </div>

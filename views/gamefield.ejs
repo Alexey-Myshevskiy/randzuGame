@@ -12,6 +12,13 @@
     <script src="/javascripts/grid.min.js"></script>
     <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
     <script>
+        function showMessage(content){
+            document.getElementById('modalContainer').innerHTML = content;
+            $('.bs-example-modal-lg').modal('show');
+            $('.bs-example-modal-lg').on('hidden.bs.modal', function (event) {
+                window.location.href='/players-room/'+playerName;
+            });
+        }
         var socket = io(window.location.origin);
         var timerID;
         var playerName="<%= playerName %>";
@@ -21,28 +28,47 @@
         socket.on('intial_step',function(player){
             if(player==playerName){
                 document.getElementById("field").addEventListener('mousedown',getPosition);
-                console.log("Ваш ход")
+                document.getElementById('hod').innerHTML="Ваш ход";
             }
             else{
                 document.getElementById("field").removeEventListener('mousedown',getPosition);
-                console.log("Ходит соперник");
+                document.getElementById('hod').innerHTML="Ходит соперник";
             }
         });
 
          socket.on("competitor_step", function (coords){
              drawFishka(document.getElementById('field'), (coords.X*50),(coords.Y*50), 'cpu',function(){
                  socket.emit('answ',playerName);
+               $('#competitor').append("<br>X="+coords.X+" : "+"Y="+coords.Y);
              });
          });
+            socket.on('winner', function (obj) {
+                window.clearInterval(timerID);
+                player.stopPlay();
+                var content;
+                if(obj.id==socket.id){
+                    content = "<div class='alert alert-success' role='alert'><h3>Вы выиграли.\t"+
+                            document.getElementById('timerDIV').innerHTML+"</h3></div>";
+                }
+                else{
+                    content = "<div class='alert alert-warning' role='alert'><h3>Вы проиграли.\t"+
+                            document.getElementById('timerDIV').innerHTML+"</h3></div>";
+                }
+                showMessage(content);
 
+            });
         socket.on('cpu_step', function (data) {
-
-            drawFishka(document.getElementById('field'), data.X, data.Y, 'cpu')
+            drawFishka(document.getElementById('field'), data.X, data.Y, 'cpu',function(){
+                $('#competitor').append("<br>X="+(((data.X-(data.X%50))/50)+1)+" : "+"Y="+(((data.Y-(data.Y%50))/50)+1));
+            });
         });
         socket.on('victory', function (data) {
             window.clearInterval(timerID);
             player.stopPlay();
-            drawFishka(document.getElementById('field'), data.coords.X, data.coords.Y, 'cpu');
+            drawFishka(document.getElementById('field'), data.coords.X, data.coords.Y, 'cpu',function(){
+                x=data.coords.X;y=data.coords.Y;
+                $('#competitor').append("<br>X="+(((x-(x%50))/50)+1)+" : "+"Y="+(((y-(y%50))/50)+1));
+            });
             var content;
             switch (data.winner) {
                 case 'cpu':
@@ -54,11 +80,7 @@
                             document.getElementById('timerDIV').innerHTML+"</h3></div>";
                     break;
             }
-            document.getElementById('modalContainer').innerHTML = content;
-            $('.bs-example-modal-lg').modal('show');
-            $('.bs-example-modal-lg').on('hidden.bs.modal', function (event) {
-                window.location.href='/players-room/'+playerName;
-            });
+            showMessage(content);
         });
         });
         player.startPlay();
@@ -128,10 +150,13 @@
 </div>
 <div class="row">
     <div class="col-lg-2 col-mg-2 col-sm-1" style="border: 1px solid red">
+Я
+        <div id="Iam">
 
+        </div>
     </div>
     <div class="panel panel-info col-lg-8 col-mg-8 col-sm-10">
-        <div class="panel-heading" id="timerDIV">Время партии: 00:00</div>
+        <div class="panel-heading" ><p id="timerDIV">Время партии: 00:00</p><p id="hod">Ваш ход</p></div>
         <div class="center-block text-center" id="gameboard">
             <canvas id='field' width="751" height="751">
                 <!-- Здесь отрисуем игровое поле -->
@@ -139,7 +164,10 @@
         </div>
     </div>
     <div class="col-lg-2 col-mg-2 col-sm-1" style="border: 1px solid red">
-        gdfg
+соперник
+        <div id="competitor">
+
+        </div>
     </div>
 </div>
 <!--                     constraint a modal message -->

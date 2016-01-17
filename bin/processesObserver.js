@@ -70,6 +70,13 @@ var mySingleton = (function () {
             },
             removeFreeRoom: function(name,callback) {
                 PlayersStore.del(name,callback);
+            },
+            isPlayerInRoom: function(roomName,playerName){
+                // for avoid wrong name of room
+                var name = (roomName.indexOf('_room')>0) ? roomName : roomName+"_room";
+                var room=PlayersStore.get(name);
+                var a= room.players.some(function(item,inde,arr){return (item.playerName==playerName)});
+                return a;
             }
         };
     };

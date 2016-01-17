@@ -7,6 +7,7 @@ function Game() {
     winningMove = 9999999;
     openFour = 8888888;
     twoThrees = 7777777;
+    this.fieldArr =new Array();
     this.data = {};
     this.f = new Array();
     this.s = new Array();
@@ -15,10 +16,12 @@ function Game() {
         this.f[i] = new Array();
         this.s[i] = new Array();
         this.q[i] = new Array();
+        this.fieldArr[i] = new Array();
         for (j = 0; j < 20; j++) {
             this.f[i][j] = 0;
             this.s[i][j] = 0;
             this.q[i][j] = 0;
+            this.fieldArr[i][j] = 0;
         }
     }
 
@@ -83,21 +86,108 @@ function Game() {
         return this.data;
     };
 
-    this.goStep = function (X,Y,enemySET) {
-        this.f[X][Y] = userSq;
-        winner = (this.winningPos(X, Y,userSq)== winningMove);
-        if(winner){
-            console.log(f);
-            return 'winner';
+    this.check=function() {
+        var lineX=0,lineY=0;
+        for(a=0;a<this.fieldArr.length;a++){
+            for(b=0;b<this.fieldArr.length;b++){
+                //-------------- X ------------------------
+                if(this.fieldArr[a][b]){
+                    lineX++;
+                }
+                else if(lineX==5){
+                    console.log("X check");
+                    return true;
+                }
+                else{
+                    lineX=0;
+                }
+                //----------------------- Y -----------------
+                if(this.fieldArr[b][a]){
+                    lineY++;
+                }
+                else if(lineY==5){
+                    console.log("Y check");
+                    return true;
+                }
+                else{
+                    lineY=0;
+                }
+            }
+            // ------ diagonales ------------------------
+            // --------- check first half path of / diag
+            if(a>=5){
+                var l=0;
+                var linediag=0;
+                for (b=a; b>=0; b--) {
+                    if(this.fieldArr[l][b]==1){
+                        linediag++;
+                    }
+                    else if(linediag==5){
+                       return true;
+                        linediag=0;
+                    }
+                    else{
+                        linediag=0;
+                    }
+                    l++;
+                }
+                // --------- check second half path of / diag
+                var linediag2=0
+                l=(this.fieldArr.length-1);
+                for (b=(this.fieldArr.length-a); b <this.fieldArr.length; b++) {
+                    if(this.fieldArr[b][l]==1){
+                        linediag2++;
+                    }
+                    else if(linediag2==5){
+                       return true;
+                    }
+                    else{
+                        linediag2=0;
+                    }
+                    l--;
+                }
+                //----------------  first path of \ diag---------------------
+                var l3=0;
+                l=0;
+                for (b=(this.fieldArr.length-a); b <this.fieldArr.length; b++) {
+                    if(this.fieldArr[b][l]==1){
+                        l3++;
+                    }
+                    else if(l3==5){
+                        return true;
+                    }
+                    else{
+                        l3=0;
+                    }
+                    l++;
+                }
+                //---------------------- check second path of \ diag ----------------------------------
+                var l4=0;
+                l=0;
+                for (b=(this.fieldArr.length-a); b <this.fieldArr.length; b++) {
+/*                    console.log("X:"+l+"*"+"Y:"+b);
+                    console.log(this.fieldArr[l][b]);*/
+                    if(this.fieldArr[l][b]==1){
+                        l4++;
+                    }
+                    else if(l4==5){
+                        return true;
+                    }
+                    else{
+                        l4=0;
+                    }
+                    l++;
+                }
+            }
         }
-/*        else if(Object.keys(enemySET).length>0){
-            his.f[enemySET.X][enemySET.Y] = machSq;
-            winner = (this.winningPos(enemySET.X, enemySET.Y,machSq)== winningMove);
-            return winner ? 'youLoose':'continue';
-        }*/
-        else{
-            return 'continue';
-        }
+        return false;
+    };
+
+
+    this.goStep = function (X, Y) {
+        this.fieldArr[Y][X]=1;
+        if (this.check()) return 'winner';
+        else return 'continue';
     };
     this.hasNeighbors = function (i, j) {
         if (j > 0 && this.f[i][j - 1] != 0) return 1;

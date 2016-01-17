@@ -12,9 +12,9 @@ function getPosition(event) {
     if (coor1 <= 5 && coor2 <= 5) {
         data.X=(x-coor1)/50;
         data.Y=(y-coor2)/50;
-
         soundEffect.play();
         drawFishka(event.target,x-coor1,y-coor2,'pl',function(){
+            $('#Iam').append("<br>X="+(data.X+1)+" : "+"Y="+(data.Y+1));
             id=socket.id;
             if(iter==0) socket.emit("step",id,data);
             else socket.emit("step",id,data,setOfField[iter]);
