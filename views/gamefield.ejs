@@ -19,6 +19,12 @@
                 window.location.href='/players-room/'+playerName;
             });
         }
+        function initialSurrender(){
+            content = "<div class='alert alert-warning' role='alert'><h3>Вы сдались.\t"+
+                    document.getElementById('timerDIV').innerHTML+"</h3></div>";
+            showMessage(content);
+            socket.emit('surrender',{});
+        }
         var socket = io(window.location.origin);
         var timerID;
         var playerName="<%= playerName %>";
@@ -82,6 +88,11 @@
             }
             showMessage(content);
         });
+        socket.on('init_surrender',function(){
+            content = "<div class='alert alert-success' role='alert'><h3>Соперник сдался-Вы выиграли.\t"+
+                    document.getElementById('timerDIV').innerHTML+"</h3></div>";
+            showMessage(content);
+        });
         });
         player.startPlay();
         timerID=startTime(0,0);
@@ -129,21 +140,17 @@
 <div class="row">
     <div class="col-md-offset-2 col-lg-offset-2 col-sm-offset-1">
         <div class="btn-toolbar col-lg-8 col-mg-8 col-sm-10" role="toolbar" aria-label="...">
-            <button type="button" class="btn btn-default">
+<!--            <button type="button" class="btn btn-default">
                 <span class="glyphicon glyphicon-pause" aria-hidden="true"></span>
                 Пауза
-            </button>
+            </button>-->
             <button id="playStop" type="button" class="btn btn-default" onclick="stopPlayBtn($(this))">
                 <span class="glyphicon glyphicon-volume-off" aria-hidden="true"></span>
                 Выключить звук
             </button>
-            <button type="button" class="btn btn-default">
+            <button type="button" class="btn btn-default" onclick="initialSurrender()">
                 <span class="glyphicon glyphicon-flag" aria-hidden="true"></span>
                 Сдаться
-            </button>
-            <button type="button" class="btn btn-default">
-                <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
-                Правила
             </button>
         </div>
     </div>

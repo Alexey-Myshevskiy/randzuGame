@@ -140,6 +140,10 @@ app.io.on('connection', function (socket) {
         }
     });// /readyToplay
 
+    socket.on('surrender', function () {
+        var room = Object.keys(app.io.sockets.adapter.sids[socket.id])[1];
+        socket.broadcast.to(room).emit('init_surrender',{});
+    });
 
     socket.on('disconnect', function () {
         //TODO: maybe need to add handler of this situation
