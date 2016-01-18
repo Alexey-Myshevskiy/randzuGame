@@ -2,6 +2,8 @@
  * Created by alexey on 02.01.16.
  */
 setOfField={};
+gridY=[];
+grid=[];
 iter=0;
 function getPosition(event) {
     var data={};
@@ -12,8 +14,9 @@ function getPosition(event) {
     if (coor1 <= 5 && coor2 <= 5) {
         data.X=(x-coor1)/50;
         data.Y=(y-coor2)/50;
-        soundEffect.play();
+
         drawFishka(event.target,x-coor1,y-coor2,'pl',function(){
+            soundEffect.play();
             $('#Iam').append("<br>X="+(data.X+1)+" : "+"Y="+(data.Y+1));
             id=socket.id;
             if(iter==0) socket.emit("step",id,data);
@@ -49,6 +52,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
     canvas.addEventListener("mousedown",getPosition);
 });
     function drawFishka(canvas, X, Y, type,callback) {
+        if(grid.indexOf(X+","+Y)>=0) return null;
         var context = canvas.getContext('2d');
         var radius = 10;
         context.beginPath();
@@ -58,5 +62,6 @@ document.addEventListener("DOMContentLoaded", function (event) {
         context.lineWidth = 5;
         context.strokeStyle = '#003300';
         context.stroke();
+        grid.push(X+","+Y);
         callback();
     }
